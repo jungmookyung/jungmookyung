@@ -266,19 +266,17 @@
           <label for="qrPass">비밀번호</label>
           <input class="input" id="qrPass" placeholder="비밀번호 없으면 비워두세요">
         </div>
-        <div class="grid2">
-          <div class="field">
-            <label for="qrSec">보안 방식</label>
-            <select class="input" id="qrSec">
-              <option value="WPA">WPA/WPA2</option>
-              <option value="WEP">WEP</option>
-              <option value="nopass">없음</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>숨김 네트워크</label>
-            <label class="switch" style="margin-top:10px"><input type="checkbox" id="qrHidden"> 숨겨진 SSID</label>
-          </div>
+        <div class="row">
+          <span class="rl">보안</span>
+          <select class="input" id="qrSec" style="flex:1">
+            <option value="WPA">WPA/WPA2</option>
+            <option value="WEP">WEP</option>
+            <option value="nopass">없음</option>
+          </select>
+        </div>
+        <div class="row">
+          <span class="rl">숨김</span>
+          <label class="switch"><input type="checkbox" id="qrHidden"> 숨겨진 SSID</label>
         </div>
       </section>
 
