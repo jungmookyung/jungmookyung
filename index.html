@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>포켓 툴즈 — 사진·PDF·QR 7가지 도구</title>
+<meta name="description" content="EXIF 제거, URL 추적 제거, PDF↔이미지, 이미지 압축, QR 생성, 비율 리사이즈, 워터마크. 모든 처리는 브라우저 안에서만 이루어집니다.">
+<meta name="theme-color" content="#ffffff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="포켓 툴즈">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar" id="topbar">
+    <button class="iconbtn" id="btnBack" aria-label="뒤로" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+    </button>
+    <div class="ttl" id="barTitle">포켓 툴즈</div>
+  </header>
+
+  <!-- ============ HOME ============ -->
+  <main class="screen on" id="screen-home">
+    <div class="hero">
+      <h1>포켓 툴즈</h1>
+      <p><b>100% 브라우저 로컬 처리</b> · 파일이 외부로 나가지 않아요</p>
+    </div>
+
+    <div class="banner" id="installBanner">
+      <div class="bi">📲</div>
+      <div class="bt">
+        <strong>홈 화면에 추가하면 앱처럼 써요</strong>
+        <div class="how" id="installHow">
+          <b>안드로이드 Chrome</b> · 오른쪽 위 ⋮ 메뉴 → <b>홈 화면에 추가</b><br>
+          <b>아이폰 Safari</b> · 아래 공유 버튼 → <b>홈 화면에 추가</b>
+        </div>
+      </div>
+      <button id="btnInstallHow">방법 보기</button>
+      <button id="btnInstall" hidden>설치</button>
+    </div>
+
+    <div class="tiles" id="tiles"></div>
+
+    <div class="foot">
+      서버로 전송되는 파일은 없습니다.<br>
+      사진·PDF 변환은 전부 <b>이 기기 안에서</b> 처리돼요.
+    </div>
+  </main>
+
+  <!-- ============ 1. EXIF·모자이크 ============ -->
+  <main class="screen" id="screen-exif">
+    <label class="drop">
+      <input type="file" accept="image/*" id="exifInput">
+      <span class="di">🖼️</span>
+      <strong>사진 선택</strong>
+      <span>EXIF 확인 → 얼굴·번호 모자이크 → 정보 지우고 저장</span>
+    </label>
+
+    <div id="exifEditor" hidden>
+      <div class="card">
+        <h3>사진에 들어있는 정보 <span class="tag" id="exifCount"></span></h3>
+        <dl class="kv" id="exifInfo"></dl>
+        <div id="exifGpsLink" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card">
+        <h3>모자이크</h3>
+        <div class="row">
+          <span class="rl">브러시</span>
+          <input type="range" id="exifBrush" min="10" max="140" value="44">
+          <span class="rv" id="exifBrushVal">44</span>
+        </div>
+        <div class="actions">
+          <button class="btn btn-sm" id="exifUndo">↶ 실행취소</button>
+          <button class="btn btn-sm" id="exifReset">✕ 전체 초기화</button>
+          <span class="spacer"></span>
+          <span class="hint" style="margin:0" id="exifMasked"></span>
+        </div>
+        <p class="hint">사진 위를 손가락으로 문질러 가릴 부분을 칠하세요.</p>
+        <div class="canvas-wrap"><canvas id="exifCanvas"></canvas></div>
+        <div class="actions">
+          <select class="input" id="exifFormat" style="width:auto;flex:1">
+            <option value="image/jpeg">JPG 저장</option>
+            <option value="image/png">PNG 저장</option>
+          </select>
+          <button class="btn btn-primary" id="exifSave" style="flex:2">정보 지우고 저장</button>
+        </div>
+        <p class="hint">저장 파일은 다시 인코딩되어 GPS·기기 정보가 <b>완전히 빠집니다.</b></p>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============ 2. URL추적제거 ============ -->
+  <main class="screen" id="screen-url">
+    <div class="card">
+      <h3>링크 붙여넣기</h3>
+      <textarea class="input" id="urlInput" placeholder="인스타·스레드·쿠팡 공유 링크를 붙여넣으세요.&#10;예) https://www.instagram.com/reel/abc/?igsh=MWx2...&utm_source=copy_link"></textarea>
+      <div class="actions">
+        <button class="btn" id="urlPaste">📋 붙여넣기</button>
+        <button class="btn" id="urlClear">지우기</button>
+        <span class="spacer"></span>
+        <button class="btn btn-primary" id="urlClean">추적 제거</button>
+      </div>
+    </div>
+
+    <div id="urlResult" hidden>
+      <div class="card">
+        <h3>깔끔한 주소 <span class="tag" id="urlCount"></span></h3>
+        <div id="urlBlocks"></div>
+        <div class="actions">
+          <button class="btn btn-primary wide" id="urlCopyAll">📋 정리된 주소 복사</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="urlHintCard">
+      <h3>이런 파라미터를 지워요</h3>
+      <div class="chips">
+        <span class="chip">utm_*</span><span class="chip">fbclid</span><span class="chip">gclid</span>
+        <span class="chip">igsh</span><span class="chip">igshid</span><span class="chip">mc_*</span>
+        <span class="chip">trcid</span><span class="chip">traid</span><span class="chip">sourceType</span>
+        <span class="chip">searchId</span><span class="chip">rank</span><span class="chip">isAddedCart</span>
+        <span class="chip">si</span><span class="chip">ref</span><span class="chip">s</span>
+      </div>
+      <p class="hint">쿠팡 상품의 itemId·vendorItemId처럼 주소에 꼭 필요한 값은 그대로 둡니다.</p>
+    </div>
+  </main>
+
+  <!-- ============ 3. PDF↔이미지 ============ -->
+  <main class="screen" id="screen-pdf">
+    <div class="tabs" id="pdfTabs">
+      <button class="on" data-tab="pdf2img">PDF → 이미지</button>
+      <button data-tab="img2pdf">이미지 → PDF</button>
+    </div>
+
+    <section id="pane-pdf2img">
+      <label class="drop">
+        <input type="file" accept="application/pdf,.pdf" id="pdfInput">
+        <span class="di">📄</span>
+        <strong>PDF 선택</strong>
+        <span>각 페이지를 고해상도 이미지로 풀어드려요</span>
+      </label>
+      <div class="card" id="pdf2imgOpts" hidden>
+        <div class="row">
+          <span class="rl">화질</span>
+          <div class="seg" id="pdfQuality">
+            <button data-q="1600" class="on">보통</button>
+            <button data-q="2400">고화질</button>
+            <button data-q="3200">최고</button>
+          </div>
+        </div>
+        <div class="row">
+          <span class="rl">형식</span>
+          <div class="seg" id="pdfFormat">
+            <button data-f="image/jpeg" class="on">JPG</button>
+            <button data-f="image/png">PNG</button>
+          </div>
+        </div>
+        <div class="progress" id="pdfProg" hidden><span id="pdfProgTxt">변환 중…</span><div class="bar"><i></i></div></div>
+        <div class="actions">
+          <button class="btn" id="pdfReconvert">다시 변환</button>
+          <span class="spacer"></span>
+          <button class="btn btn-primary" id="pdfZip">전체 ZIP 저장</button>
+        </div>
+        <div class="thumbs" id="pdfPages"></div>
+      </div>
+    </section>
+
+    <section id="pane-img2pdf" hidden>
+      <label class="drop">
+        <input type="file" accept="image/*" multiple id="img2pdfInput">
+        <span class="di">🖼️</span>
+        <strong>사진 여러 장 선택</strong>
+        <span>순서대로 1개의 PDF로 묶어드려요</span>
+      </label>
+      <div class="card" id="img2pdfOpts" hidden>
+        <div class="row">
+          <span class="rl">용지</span>
+          <div class="seg" id="img2pdfSize">
+            <button data-s="auto" class="on">자동(사진 크기)</button>
+            <button data-s="a4">A4</button>
+          </div>
+        </div>
+        <div class="list" id="img2pdfList"></div>
+        <div class="summary" id="img2pdfSum"></div>
+        <div class="actions">
+          <button class="btn btn-primary wide" id="img2pdfMake">PDF 만들기</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ 4. 이미지압축 ============ -->
+  <main class="screen" id="screen-compress">
+    <label class="drop">
+      <input type="file" accept="image/*" multiple id="cmpInput">
+      <span class="di">🗜️</span>
+      <strong>사진 여러 장 선택</strong>
+      <span>화질은 지키고 용량만 줄여요</span>
+    </label>
+
+    <div class="card" id="cmpOpts" hidden>
+      <div class="row">
+        <span class="rl">형식</span>
+        <div class="seg" id="cmpFormat">
+          <button data-f="auto" class="on">원본 유지</button>
+          <button data-f="image/jpeg">JPG</button>
+          <button data-f="image/png">PNG</button>
+          <button data-f="image/webp">WebP</button>
+        </div>
+      </div>
+      <div class="row">
+        <span class="rl">품질</span>
+        <input type="range" id="cmpQuality" min="10" max="100" step="5" value="80">
+        <span class="rv" id="cmpQualityVal">80%</span>
+      </div>
+      <div class="row">
+        <span class="rl">최대 가로</span>
+        <select class="input" id="cmpMaxWidth" style="flex:1">
+          <option value="0">원본 크기 유지</option>
+          <option value="2560">2560px</option>
+          <option value="1920">1920px</option>
+          <option value="1280">1280px</option>
+          <option value="1080">1080px</option>
+          <option value="800">800px</option>
+        </select>
+      </div>
+      <div class="progress" id="cmpProg" hidden><span id="cmpProgTxt">처리 중…</span><div class="bar"><i></i></div></div>
+      <div class="summary" id="cmpSum"></div>
+      <div class="list" id="cmpList"></div>
+      <div class="actions">
+        <button class="btn" id="cmpClear">목록 비우기</button>
+        <span class="spacer"></span>
+        <button class="btn btn-primary" id="cmpZip">전체 ZIP 저장</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============ 5. QR생성기 ============ -->
+  <main class="screen" id="screen-qr">
+    <div class="tabs" id="qrTabs">
+      <button class="on" data-tab="link">링크·텍스트</button>
+      <button data-tab="wifi">와이파이</button>
+    </div>
+
+    <div class="card">
+      <section id="pane-qr-link">
+        <div class="field">
+          <label for="qrText">주소 또는 글자</label>
+          <textarea class="input" id="qrText" placeholder="https://example.com 또는 안내 문구"></textarea>
+        </div>
+      </section>
+
+      <section id="pane-qr-wifi" hidden>
+        <div class="field">
+          <label for="qrSsid">와이파이 이름 (SSID)</label>
+          <input class="input" id="qrSsid" placeholder="예) home_wifi" autocapitalize="off" autocorrect="off">
+        </div>
+        <div class="field">
+          <label for="qrPass">비밀번호</label>
+          <input class="input" id="qrPass" placeholder="비밀번호 없으면 비워두세요">
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label for="qrSec">보안 방식</label>
+            <select class="input" id="qrSec">
+              <option value="WPA">WPA/WPA2</option>
+              <option value="WEP">WEP</option>
+              <option value="nopass">없음</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>숨김 네트워크</label>
+            <label class="switch" style="margin-top:10px"><input type="checkbox" id="qrHidden"> 숨겨진 SSID</label>
+          </div>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+      <div class="row">
+        <span class="rl">크기</span>
+        <div class="seg" id="qrSize">
+          <button data-s="300" class="on">300</button>
+          <button data-s="600">600</button>
+          <button data-s="1024">1024</button>
+        </div>
+      </div>
+      <div class="row">
+        <span class="rl">색상</span>
+        <input type="color" id="qrDark" value="#111111">
+        <input type="color" id="qrLight" value="#ffffff">
+        <span class="rl" style="min-width:0">여백</span>
+        <select class="input" id="qrMargin" style="flex:1">
+          <option value="1">좁게</option>
+          <option value="2" selected>보통</option>
+          <option value="3">넓게</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>QR 미리보기 <span class="tag" id="qrMeta"></span></h3>
+      <div class="canvas-wrap" style="background:#fff;padding:12px">
+        <canvas id="qrCanvas" width="300" height="300" style="max-width:280px"></canvas>
+      </div>
+      <p class="hint" id="qrEmpty">내용을 입력하면 바로 만들어집니다.</p>
+      <div class="actions">
+        <button class="btn btn-primary wide" id="qrSave">PNG로 저장</button>
+      </div>
+      <p class="hint">만료 기간 없음 · 광고 없음 · 서버 전송 없음</p>
+    </div>
+  </main>
+
+  <!-- ============ 6. 비율리사이즈 ============ -->
+  <main class="screen" id="screen-resize">
+    <label class="drop">
+      <input type="file" accept="image/*" id="rsInput">
+      <span class="di">📐</span>
+      <strong>사진 선택</strong>
+      <span>스레드·인스타 비율에 맞춰 잘리지 않게 조정</span>
+    </label>
+
+    <div class="card" id="rsOpts" hidden>
+      <div class="field">
+        <span class="flabel">비율</span>
+        <div class="seg" id="rsRatio">
+          <button data-r="1:1" class="on">1:1</button>
+          <button data-r="4:5">4:5</button>
+          <button data-r="16:9">16:9</button>
+          <button data-r="9:16">9:16</button>
+          <button data-r="3:4">3:4</button>
+        </div>
+      </div>
+      <div class="field">
+        <span class="flabel">여백 채우기</span>
+        <div class="seg" id="rsBg">
+          <button data-b="white" class="on">흰 여백</button>
+          <button data-b="black">검정 여백</button>
+          <button data-b="blur">블러 배경</button>
+        </div>
+      </div>
+      <div class="row">
+        <span class="rl">긴 변</span>
+        <select class="input" id="rsSize" style="flex:1">
+          <option value="720">720px</option>
+          <option value="1080" selected>1080px</option>
+          <option value="1440">1440px</option>
+          <option value="2048">2048px</option>
+        </select>
+      </div>
+      <p class="hint" id="rsDims"></p>
+      <div class="canvas-wrap checker"><canvas id="rsCanvas"></canvas></div>
+      <div class="actions">
+        <select class="input" id="rsFormat" style="width:auto;flex:1">
+          <option value="image/jpeg">JPG</option>
+          <option value="image/png">PNG</option>
+        </select>
+        <button class="btn btn-primary" id="rsSave" style="flex:2">저장</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============ 7. 워터마크 ============ -->
+  <main class="screen" id="screen-wm">
+    <label class="drop">
+      <input type="file" accept="image/*" multiple id="wmInput">
+      <span class="di">🔖</span>
+      <strong>사진 여러 장 선택</strong>
+      <span>내 아이디·로고를 한 번에 박아 넣어요</span>
+    </label>
+
+    <div class="card" id="wmOpts" hidden>
+      <div class="seg" id="wmMode" style="margin-bottom:12px">
+        <button data-m="text" class="on">텍스트</button>
+        <button data-m="logo">로고 이미지</button>
+      </div>
+
+      <section id="pane-wm-text">
+        <div class="field">
+          <label for="wmText">문구</label>
+          <input class="input" id="wmText" value="" placeholder="예) @my_id">
+        </div>
+      </section>
+
+      <section id="pane-wm-logo" hidden>
+        <label class="field" style="display:block">
+          <span class="flabel">로고 이미지 (PNG 권장)</span>
+          <input class="input" type="file" accept="image/*" id="wmLogoInput" style="padding:9px">
+        </label>
+        <p class="hint" id="wmLogoName" style="margin-top:-4px">선택된 로고 없음</p>
+      </section>
+
+      <div class="row">
+        <span class="rl">크기</span>
+        <input type="range" id="wmSize" min="2" max="30" step="1" value="7">
+        <span class="rv" id="wmSizeVal">7%</span>
+      </div>
+      <div class="row">
+        <span class="rl">투명도</span>
+        <input type="range" id="wmOpacity" min="10" max="100" step="5" value="70">
+        <span class="rv" id="wmOpacityVal">70%</span>
+      </div>
+      <div class="row" id="wmColorRow">
+        <span class="rl">색상</span>
+        <input type="color" id="wmColor" value="#ffffff">
+        <label class="switch" style="margin-left:auto"><input type="checkbox" id="wmShadow" checked> 그림자</label>
+      </div>
+      <div class="field" style="margin-top:12px">
+        <span class="flabel">위치</span>
+        <div class="seg" id="wmPos">
+          <button data-p="tl">좌상</button>
+          <button data-p="tr">우상</button>
+          <button data-p="bl">좌하</button>
+          <button data-p="br" class="on">우하</button>
+          <button data-p="center">중앙</button>
+          <button data-p="tile">타일</button>
+        </div>
+      </div>
+
+      <p class="hint">미리보기</p>
+      <div class="canvas-wrap checker"><canvas id="wmCanvas"></canvas></div>
+
+      <div class="actions">
+        <button class="btn btn-primary wide" id="wmApply">전체 적용</button>
+      </div>
+      <div class="summary" id="wmSum" hidden></div>
+      <div class="list" id="wmList"></div>
+      <div class="actions" id="wmZipRow" hidden>
+        <button class="btn wide" id="wmZip">전체 ZIP 저장</button>
+      </div>
+    </div>
+  </main>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="vendor/exifr.umd.js"></script>
+<script src="vendor/qrcode.js"></script>
+<script src="vendor/jszip.min.js"></script>
+<script src="js/util.js"></script>
+<script src="js/tools/exif.js"></script>
+<script src="js/tools/url.js"></script>
+<script src="js/tools/pdf.js"></script>
+<script src="js/tools/compress.js"></script>
+<script src="js/tools/qr.js"></script>
+<script src="js/tools/resize.js"></script>
+<script src="js/tools/watermark.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
