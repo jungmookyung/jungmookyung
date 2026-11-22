@@ -232,7 +232,7 @@
       st.mode = b.getAttribute('data-m');
       $('#pane-wm-text').hidden = st.mode !== 'text';
       $('#pane-wm-logo').hidden = st.mode !== 'logo';
-      $('#wmColorRow').hidden = false;
+      $('#wmColorRow').hidden = st.mode !== 'text';
       renderPreview();
     });
 

@@ -17,9 +17,13 @@
     strokes: [],
     cur: null,
     drawing: false,
-    brush: 44,
+    brush: 5, /* 이미지 가로 대비 % */
     w: 0, h: 0
   };
+
+  function brushPx() {
+    return Math.max(10, Math.round(state.w * state.brush / 100));
+  }
 
   function fmtDate(d) {
     if (!(d instanceof Date) || isNaN(d)) return String(d);
@@ -117,6 +121,8 @@
       updateMasked();
 
       $('#exifEditor').hidden = false;
+      var dropStrong = document.querySelector('#screen-exif .drop strong');
+      if (dropStrong) dropStrong.textContent = '다른 사진 선택';
 
       /* 메타데이터 표시 */
       var data = await readExif(file);
@@ -124,7 +130,7 @@
       var info = $('#exifInfo');
       var linkWrap = $('#exifGpsLink');
       linkWrap.innerHTML = '';
-      if (!data || Object.keys(data).length === 0) {
+      if (!rows.length) {
         info.innerHTML = '<dt>결과</dt><dd>메타데이터 없음 — 위치·기기 정보가 들어있지 않아요.</dd>' +
           '<dt>파일</dt><dd>' + U.fmtBytes(file.size) + ' · ' + w + '×' + h + '</dd>';
         $('#exifCount').textContent = '없음';
@@ -142,7 +148,7 @@
         html += '<dt>파일</dt><dd>' + U.fmtBytes(file.size) + ' · ' + w + '×' + h +
           (scale < 1 ? ' (편집용 ' + state.w + '×' + state.h + ')' : '') + '</dd>';
         info.innerHTML = html;
-        $('#exifCount').textContent = Object.keys(data).length + '개 항목';
+        $('#exifCount').textContent = rows.length + '개 항목';
       }
       U.toast('불러왔어요. 문질러서 가리세요');
     } catch (e) {
@@ -170,7 +176,7 @@
     if (rx + rw > state.w) rw = state.w - rx;
     if (ry + rh > state.h) rh = state.h - ry;
     if (rw < 2 || rh < 2) return;
-    var block = Math.max(2, Math.round(s / 14));
+    var block = Math.max(4, Math.round(s / 5));
     var sw = Math.max(1, Math.round(rw / block));
     var sh = Math.max(1, Math.round(rh / block));
     scratch.width = sw; scratch.height = sh;
@@ -214,24 +220,24 @@
       try { c.setPointerCapture(e.pointerId); } catch (err) {}
       state.drawing = true;
       var p = pos(e);
-      state.cur = { size: state.brush, points: [p] };
+      state.cur = { size: brushPx(), points: [p] };
       state.strokes.push(state.cur);
-      pixelate(p.x, p.y, state.brush);
+      pixelate(p.x, p.y, brushPx());
       updateMasked();
     });
     c.addEventListener('pointermove', function (e) {
       if (!state.drawing || !state.cur) return;
       e.preventDefault();
       var p = pos(e);
+      var bs = state.cur.size;
       var last = state.cur.points[state.cur.points.length - 1];
       var d = Math.hypot(p.x - last.x, p.y - last.y);
-      if (d < Math.max(3, state.brush / 5)) return;
-      // 간격을 두고 여러 점을 찍어 끊김 방지
-      var steps = Math.min(12, Math.ceil(d / Math.max(4, state.brush / 3)));
+      if (d < Math.max(3, bs / 6)) return;
+      var steps = Math.min(16, Math.ceil(d / Math.max(3, bs / 8)));
       for (var i = 1; i <= steps; i++) {
         var q = { x: last.x + (p.x - last.x) * i / steps, y: last.y + (p.y - last.y) * i / steps };
         state.cur.points.push(q);
-        pixelate(q.x, q.y, state.brush);
+        pixelate(q.x, q.y, bs);
       }
     });
     function end() {
@@ -271,7 +277,7 @@
     });
     $('#exifBrush').addEventListener('input', function () {
       state.brush = +this.value;
-      $('#exifBrushVal').textContent = this.value;
+      $('#exifBrushVal').textContent = this.value + '%';
     });
     $('#exifUndo').addEventListener('click', function () {
       if (!state.strokes.length) { U.toast('되돌릴 게 없어요'); return; }

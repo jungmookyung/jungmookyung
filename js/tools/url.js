@@ -197,6 +197,7 @@
     });
     $('#urlCount').textContent = okOnes.length > 1 ? okOnes.length + '개 링크' : (okOnes[0].removed.length ? okOnes[0].removed.length + '개 제거' : '깨끗함');
     $('#urlResult').hidden = false;
+    $('#urlResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     var totalRemoved = okOnes.reduce(function (n, r) { return n + r.removed.length; }, 0);
     U.toast(totalRemoved ? '추적 파라미터 ' + totalRemoved + '개를 지웠어요' : '이미 깔끔한 주소예요');

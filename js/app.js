@@ -47,6 +47,7 @@
     var id = titles[raw] ? raw : 'home';
     U.$$('.screen').forEach(function (s) { s.classList.toggle('on', s.id === 'screen-' + id); });
     U.$('#barTitle').textContent = titles[id];
+    U.$('#topbar').hidden = (id === 'home');
     U.$('#btnBack').hidden = (id === 'home');
     document.title = id === 'home' ? '포켓 툴즈' : titles[id] + ' · 포켓 툴즈';
     current = id;

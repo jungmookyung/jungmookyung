@@ -159,11 +159,8 @@
       add(e.target.files);
       e.target.value = '';
     });
-    $('#cmpFormat').addEventListener('click', function (e) {
-      var b = e.target.closest('button[data-f]');
-      if (!b) return;
-      U.$$('button', this).forEach(function (x) { x.classList.toggle('on', x === b); });
-      st.format = b.getAttribute('data-f');
+    $('#cmpFormat').addEventListener('change', function () {
+      st.format = this.value;
       st.items.forEach(function (it) { it.out = null; });
       schedule();
     });

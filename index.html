@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="포켓 툴즈">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
@@ -73,8 +73,8 @@
         <h3>모자이크</h3>
         <div class="row">
           <span class="rl">브러시</span>
-          <input type="range" id="exifBrush" min="10" max="140" value="44">
-          <span class="rv" id="exifBrushVal">44</span>
+          <input type="range" id="exifBrush" min="2" max="20" step="1" value="5">
+          <span class="rv" id="exifBrushVal">5%</span>
         </div>
         <div class="actions">
           <button class="btn btn-sm" id="exifUndo">↶ 실행취소</button>
@@ -123,7 +123,7 @@
       <h3>이런 파라미터를 지워요</h3>
       <div class="chips">
         <span class="chip">utm_*</span><span class="chip">fbclid</span><span class="chip">gclid</span>
-        <span class="chip">igsh</span><span class="chip">igshid</span><span class="chip">mc_*</span>
+        <span class="chip">igsh</span><span class="chip">mc_*</span>
         <span class="chip">trcid</span><span class="chip">traid</span><span class="chip">sourceType</span>
         <span class="chip">searchId</span><span class="chip">rank</span><span class="chip">isAddedCart</span>
         <span class="chip">si</span><span class="chip">ref</span><span class="chip">s</span>
@@ -208,12 +208,12 @@
     <div class="card" id="cmpOpts" hidden>
       <div class="row">
         <span class="rl">형식</span>
-        <div class="seg" id="cmpFormat">
-          <button data-f="auto" class="on">원본 유지</button>
-          <button data-f="image/jpeg">JPG</button>
-          <button data-f="image/png">PNG</button>
-          <button data-f="image/webp">WebP</button>
-        </div>
+        <select class="input" id="cmpFormat" style="flex:1">
+          <option value="auto">원본 유지</option>
+          <option value="image/jpeg">JPG</option>
+          <option value="image/png">PNG</option>
+          <option value="image/webp">WebP</option>
+        </select>
       </div>
       <div class="row">
         <span class="rl">품질</span>
@@ -295,7 +295,10 @@
         <span class="rl">색상</span>
         <input type="color" id="qrDark" value="#111111">
         <input type="color" id="qrLight" value="#ffffff">
-        <span class="rl" style="min-width:0">여백</span>
+        <span class="hint" style="margin:0">코드 / 배경</span>
+      </div>
+      <div class="row">
+        <span class="rl">여백</span>
         <select class="input" id="qrMargin" style="flex:1">
           <option value="1">좁게</option>
           <option value="2" selected>보통</option>
@@ -346,7 +349,7 @@
         </div>
       </div>
       <div class="row">
-        <span class="rl">긴 변</span>
+        <span class="rl">짧은 변</span>
         <select class="input" id="rsSize" style="flex:1">
           <option value="720">720px</option>
           <option value="1080" selected>1080px</option>

@@ -53,8 +53,8 @@
       var n = qr.getModuleCount();
       var margin = st.margin;
       var total = n + margin * 2;
-      var cell = Math.max(1, Math.floor(st.size / total));
-      var px = cell * total;
+      var cell = st.size / total;
+      var px = st.size;
       canvas.width = px;
       canvas.height = px;
       var ctx = canvas.getContext('2d');
@@ -64,7 +64,11 @@
       for (var r = 0; r < n; r++) {
         for (var c = 0; c < n; c++) {
           if (qr.isDark(r, c)) {
-            ctx.fillRect((c + margin) * cell, (r + margin) * cell, cell, cell);
+            var x0 = Math.round((c + margin) * cell);
+            var y0 = Math.round((r + margin) * cell);
+            var x1 = Math.round((c + margin + 1) * cell);
+            var y1 = Math.round((r + margin + 1) * cell);
+            ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
           }
         }
       }

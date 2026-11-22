@@ -17,12 +17,14 @@
     return filterOK;
   }
 
-  function dims(ratio, longEdge) {
+  function dims(ratio, size) {
     var p = ratio.split(':').map(Number);
     var rw = p[0], rh = p[1];
     var W, H;
-    if (rw >= rh) { W = longEdge; H = Math.round(longEdge * rh / rw); }
-    else { H = longEdge; W = Math.round(longEdge * rw / rh); }
+    // 기준값 = 짧은 변 (1080이면 9:16 → 1080×1920)
+    if (rw === rh) { W = size; H = size; }
+    else if (rw > rh) { W = Math.round(size * rw / rh); H = size; }
+    else { W = size; H = Math.round(size * rh / rw); }
     return { W: W, H: H };
   }
 
