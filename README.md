@@ -43,16 +43,19 @@ python3 -m http.server 8000
 `index.html`을 파일로 직접 열어도 대부분 동작하지만, 서비스워커·클립보드는
 `localhost` 또는 HTTPS에서만 동작합니다.
 
-## GitHub Pages로 배포
+## GitHub Pages 배포
+
+**지금 열려 있는 주소: <https://jungmookyung.github.io/jungmookyung/>**
+
+배포는 `jungmookyung/jungmookyung` 저장소의 `main` 브랜치 루트에서 GitHub Pages로 나갑니다.
+모든 경로가 상대경로라 `jungmookyung/` 같은 하위 경로에서도 그대로 동작합니다.
 
 ```bash
-# 저장소는 직접 한 번만 만들어 주세요 (GitHub 웹에서 New repository → pocket-tools, Public)
-git remote add origin https://github.com/<계정>/pocket-tools.git
+git remote add origin https://github.com/jungmookyung/jungmookyung.git
 git push -u origin main
-# Settings → pages → Source: Deploy from a branch → main / (root) → Save
+# Settings → Pages → Source: Deploy from a branch → main / (root) → Save
 ```
 
-잠시 뒤 `https://<계정>.github.io/pocket-tools/` 에서 열립니다.
 폰 Chrome에서 주소를 연 다음 **⋮ → 홈 화면에 추가**를 누르면 앱처럼 실행됩니다.
 
 ## 개인정보
